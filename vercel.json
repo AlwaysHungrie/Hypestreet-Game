@@ -1,6 +1,11 @@
 {
-  "buildCommand": "npm run build",
+  "installCommand": "true",
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
-  "installCommand": "cd ../.. && npm install && npm run build && cd examples/flappy-bird && npm install"
+  "rewrites": [
+    {
+      "source": "/api/extended/:path*",
+      "destination": "https://api.starknet.extended.exchange/:path*"
+    }
+  ]
 }
