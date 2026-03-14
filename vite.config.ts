@@ -23,6 +23,11 @@ function stripExtendedSdkSourcemaps() {
 
 export default defineConfig({
   plugins: [stripExtendedSdkSourcemaps(), basicSsl()],
+  define: {
+    // Dependencies reference process.env; browser has no process
+    "process.env.NODE_ENV": JSON.stringify("production"),
+    "process.env": "{}",
+  },
   server: {
     https: true,
     allowedHosts: ["localhost", ".trycloudflare.com"],
@@ -66,4 +71,11 @@ export default defineConfig({
     include: ["@cartridge/controller"],
   },
   assetsInclude: ["**/*.wasm"],
+  build: {
+    rollupOptions: {
+      output: {
+        intro: "typeof globalThis !== 'undefined' && (globalThis.process = globalThis.process || { env: { NODE_ENV: 'production' } });",
+      },
+    },
+  },
 });
