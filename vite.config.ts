@@ -74,7 +74,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        intro: "typeof globalThis !== 'undefined' && (globalThis.process = globalThis.process || { env: { NODE_ENV: 'production' } });",
+        intro: "typeof globalThis !== 'undefined' && (globalThis.process = globalThis.process || { env: { NODE_ENV: 'production' }, version: 'v18.0.0' });",
       },
     },
   },
