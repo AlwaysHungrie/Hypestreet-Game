@@ -1,6 +1,10 @@
 import { defineConfig } from "vite";
 import path from "path";
+import { existsSync } from "fs";
 import basicSsl from "@vitejs/plugin-basic-ssl";
+
+const monorepoSrc = path.resolve(__dirname, "../../src");
+const useMonorepoX = existsSync(path.join(monorepoSrc, "index.ts"));
 
 /** Strip sourcemap comments from extended-typescript-sdk so missing source file warnings are avoided. */
 function stripExtendedSdkSourcemaps() {
@@ -32,11 +36,16 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      x: path.resolve(__dirname, "../../src/index.ts"),
-      "@": path.resolve(__dirname, "../../src"),
-      // Resolve from example's node_modules when bundling aliased ../../src code
+      // In monorepo: use local ../../src; on Vercel/standalone: use published "x" from node_modules
+      ...(useMonorepoX
+        ? {
+            x: path.join(monorepoSrc, "index.ts"),
+            "@": monorepoSrc,
+          }
+        : {}),
+      // Resolve from this app's node_modules so monorepo x (../../src) can find starknet
+      starknet: path.resolve(__dirname, "node_modules/starknet"),
       "@cartridge/controller": path.resolve(__dirname, "node_modules/@cartridge/controller"),
-      // Extended-TS-SDK signer loads WASM via this path; resolve to package wasm dir
       "/wasm/stark_crypto_wasm-web.js": path.resolve(
         __dirname,
         "node_modules/extended-typescript-sdk/wasm/stark_crypto_wasm-web.js"
@@ -44,7 +53,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ["x", "extended-typescript-sdk"],
+    exclude: useMonorepoX ? ["x", "extended-typescript-sdk"] : ["extended-typescript-sdk"],
     include: ["@cartridge/controller"],
   },
   assetsInclude: ["**/*.wasm"],
