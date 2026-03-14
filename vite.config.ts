@@ -64,6 +64,8 @@ export default defineConfig({
         __dirname,
         "node_modules/extended-typescript-sdk/wasm/stark_crypto_wasm-web.js"
       ),
+      // Node "util" (e.g. util.inherits) for deps that expect it in the browser
+      util: path.resolve(__dirname, "util-shim.js"),
     },
   },
   optimizeDeps: {
