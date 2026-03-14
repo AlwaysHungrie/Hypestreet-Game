@@ -34,6 +34,15 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    proxy: {
+      "/api/extended": {
+        target: "https://api.starknet.extended.exchange",
+        changeOrigin: true,
+        rewrite: (path) => path.slice("/api/extended".length),
+      },
+    },
+  },
   resolve: {
     alias: {
       // In monorepo: use local ../../src; on Vercel/standalone: use published "x" from node_modules
