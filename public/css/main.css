@@ -1,0 +1,347 @@
+/* Retro top-down racing: road, car, traffic falling */
+/* Stripes move down = road coming toward you */
+@-webkit-keyframes animRoadStripes {
+   0% { background-position: 0 0, 0 0; }
+   100% { background-position: 0 0, 0 80px; }
+}
+@keyframes animRoadStripes {
+   0% { background-position: 0 0, 0 0; }
+   100% { background-position: 0 0, 0 80px; }
+}
+
+@-webkit-keyframes rideMsgFlash {
+   0%, 100% { opacity: 1; color: #e74c3c; text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000; }
+   50% { opacity: 0.75; color: #fff; text-shadow: 2px 2px 0 #e74c3c, 3px 3px 0 #000; }
+}
+@keyframes rideMsgFlash {
+   0%, 100% { opacity: 1; color: #e74c3c; text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000; }
+   50% { opacity: 0.75; color: #fff; text-shadow: 2px 2px 0 #e74c3c, 3px 3px 0 #000; }
+}
+
+@-webkit-keyframes animTrafficFall {
+   0% { top: -70px; }
+   100% { top: 100%; }
+}
+@keyframes animTrafficFall {
+   0% { top: -70px; }
+   100% { top: 100%; }
+}
+
+*,
+*:before,
+*:after
+{
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   box-sizing: border-box;
+   -webkit-touch-callout: none;
+   -webkit-user-select: none;
+   -khtml-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+}
+
+html,
+body
+{
+   margin: 0;
+   padding: 0;
+   width: 100%;
+   height: 100%;
+   overflow: hidden;
+   font-family: 'Press Start 2P', monospace;
+   font-size: 12px;
+   color: #fff;
+}
+
+/* Game fills entire viewport */
+#gamecontainer
+{
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   width: 100%;
+   height: 100%;
+   min-height: 400px;
+}
+
+#gamescreen
+{
+   position: absolute;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   width: 100%;
+   height: 100%;
+   min-height: 400px;
+   background: #1a1a2e;
+}
+
+/* Road = flyarea: two lanes, narrower width, center line only */
+#flyarea
+{
+   position: absolute;
+   top: 0;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 100%;
+   max-width: 280px;
+   height: 100%;
+   min-height: 400px;
+   box-sizing: border-box;
+   /* Asphalt with two equal lanes (50% each), single white center line */
+   background-color: #3d3d3d;
+   background-image:
+      /* Center lane line - white */
+      linear-gradient(90deg, transparent 0%, transparent 49.2%, #fff 49.2%, #fff 50.8%, transparent 50.8%, transparent 100%),
+      /* Horizontal white dashes scrolling down */
+      repeating-linear-gradient(
+         0deg,
+         transparent 0,
+         transparent 35px,
+         rgba(255,255,255,0.85) 35px,
+         rgba(255,255,255,0.85) 42px
+      );
+   background-size: 100% 100%, 100% 80px;
+   background-repeat: no-repeat, repeat-y;
+   background-position: 0 0, 0 0;
+   animation: animRoadStripes 600ms linear infinite;
+   border-left: 10px solid #2a2a2a;
+   border-right: 10px solid #2a2a2a;
+   overflow: visible;
+}
+
+#ceiling
+{
+   display: none;
+}
+
+#land
+{
+   display: none;
+}
+
+#bigscore
+{
+   position: absolute;
+   top: 20px;
+   left: 150px;
+   z-index: 100;
+}
+
+#bigscore img
+{
+   display: inline-block;
+   padding: 1px;
+}
+
+#splash
+{
+   position: absolute;
+   opacity: 0;
+   top: 60px;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 280px;
+   text-align: center;
+   color: #fff;
+   text-shadow: 2px 2px 0 #e74c3c, 3px 3px 0 #000;
+   font-family: 'Press Start 2P', cursive;
+   font-size: 14px;
+   line-height: 1.8;
+}
+
+#splash .splash-title {
+   font-size: 18px;
+   margin-bottom: 20px;
+   letter-spacing: 2px;
+}
+
+#splash .splash-sub {
+   font-size: 8px;
+   color: #aaa;
+   text-shadow: 1px 1px 0 #000;
+}
+#splash .splash-start {
+   font-size: 10px;
+   color: #ffcc00;
+   margin: 12px 0;
+   text-shadow: 1px 1px 0 #000;
+}
+
+#scoreboard
+{
+   position: absolute;
+   display: none;
+   opacity: 0;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   width: 280px;
+   padding: 24px;
+   background: rgba(78, 192, 202, 0.98);
+   border: 4px solid #2c3e50;
+   border-radius: 8px;
+   box-shadow: 6px 6px 0 #2c3e50;
+   z-index: 1000;
+   text-align: center;
+}
+
+#game-over-pnl {
+   font-family: 'Press Start 2P', cursive;
+   font-size: 8px;
+   color: #2c3e50;
+   line-height: 1.6;
+   margin-bottom: 16px;
+   text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+
+#game-over-pnl strong {
+   display: block;
+   font-size: 10px;
+   margin-top: 8px;
+   color: #1a252f;
+}
+
+#scoreboard #replay {
+   position: relative;
+   opacity: 1;
+   top: auto;
+   left: auto;
+   margin: 0 auto;
+   height: auto;
+   width: auto;
+   cursor: pointer;
+   display: inline-block;
+}
+
+.boundingbox
+{
+   position: absolute;
+   display: none;
+   top: 0;
+   left: 0;
+   width: 0;
+   height: 0;
+   border: 2px solid red;
+   z-index: 100;
+}
+
+/* Player car: fixed at bottom, horizontal position set by JS (playerX) */
+#player
+{
+   position: absolute;
+   bottom: 20px;
+   left: 0;
+   width: 34px;
+   height: 44px;
+   z-index: 25;
+}
+
+.car
+{
+   position: absolute;
+   width: 34px;
+   height: 44px;
+   left: 0;
+   top: 0;
+   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 40%, #922b21 100%);
+   border: 3px solid #fff;
+   border-radius: 6px;
+   box-shadow: 0 0 0 1px #333, inset 0 2px 0 rgba(255,255,255,0.3);
+}
+
+.car::before
+{
+   content: "";
+   position: absolute;
+   top: 8px;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 14px;
+   height: 12px;
+   background: #2c3e50;
+   border-radius: 2px;
+}
+
+/* Traffic: row of 3 equal lanes; each lane has one car (or gap) centered, car-shaped */
+.traffic-row
+{
+   position: absolute;
+   left: 10px;
+   right: 10px;
+   top: -70px;
+   width: calc(100% - 20px);
+   height: 56px;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   z-index: 15;
+   pointer-events: none;
+   -webkit-animation: animTrafficFall 4s linear forwards;
+   animation: animTrafficFall 4s linear forwards;
+}
+
+.traffic-row .traffic-lane
+{
+   flex: 1 1 0;
+   min-width: 0;
+   height: 56px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.traffic-row .traffic-car
+{
+   position: relative;
+   width: 34px;
+   height: 44px;
+   flex: 0 0 auto;
+   box-sizing: border-box;
+   background: linear-gradient(180deg, #3498db 0%, #2980b9 45%, #1c5a85 100%);
+   border: 3px solid #5dade2;
+   border-radius: 6px;
+   box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.25);
+}
+
+.traffic-row .traffic-car::before
+{
+   content: "";
+   position: absolute;
+   top: 8px;
+   left: 50%;
+   transform: translateX(-50%);
+   width: 12px;
+   height: 10px;
+   background: #1a252f;
+   border-radius: 2px;
+}
+
+.traffic-row .traffic-lane.traffic-gap
+{
+   /* empty lane - no car */
+}
+
+#footer
+{
+   position: absolute;
+   bottom: 3px;
+   left: 3px;
+}
+
+#footer a,
+#footer a:link,
+#footer a:visited,
+#footer a:hover,
+#footer a:active
+{
+   display: block;
+   padding: 2px;
+   text-decoration: none;
+   color: #888;
+}

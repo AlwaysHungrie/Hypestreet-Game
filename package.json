@@ -1,0 +1,21 @@
+{
+  "name": "flappy-bird-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cartridge/controller": "^0.13.9",
+    "extended-typescript-sdk": "^0.8.1",
+    "starknet": "^9.2.1",
+    "x": "^0.1.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.1.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}
